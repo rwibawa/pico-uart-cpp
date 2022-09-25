@@ -50,11 +50,19 @@ drwxr-xr-x 3 ryan ryan   4096 Sep 24 19:41 pioasm/
 # Add debug symbols
 /build$ cmake -DCMAKE_BUILD_TYPE=Debug ..
 /build$ make -j8
+
+$ src/openocd -f interface/picoprobe.cfg -f target/rp2040.cfg -s tcl
+$ sudo apt install gdb-multiarch
+
+/build$ gdb-multiarch pico-uart-cpp.elf
+(gdb) monitor reset init
+(gdb) continue
+
 ```
 
 [disassembled result](build/pico-uart-cpp.dis)
 
-## File type
+### File type
 |File extension |Description|
 | :--- | :--- |
 |.bin |Raw binary dump of the program code and data|
@@ -65,3 +73,97 @@ board when it is mounted as a USB drive|
 |.hex |Hexdump of the compiled binary|
 |.map |A map file to accompany the .elf file describing where the linker has arranged segments
 in memory|
+
+## 2. Using Picoprobe
+
+![picoprobe](img/picoprobe.jpg)
+
+### Build OpenOCD
+For picoprobe to work, you need to build openocd with <ins>the picoprobe driver enabled</ins>.
+
+```sh
+$ sudo apt install -y automake autoconf build-essential texinfo libtool libftdi-dev libusb-1.0-0-dev
+$ cd ~/workspace_arm/
+
+$ git clone https://github.com/raspberrypi/openocd.git --branch rp2040 --depth=1 --no-single-branch
+$ cd openocd/
+$ ./bootstrap 
+$ ./configure --enable-picoprobe
+$ make -j8
+$ sudo make install
+```
+
+### Build `picoprobe`
+```sh
+$ export PICO_SDK_PATH=~/workspace_arm/pico-sdk
+$ cd ~/workspace_arm/
+
+$ git clone https://github.com/raspberrypi/picoprobe.git
+$ cd picoprobe/
+$ cp ~/workspace_arm/pico-sdk/external/pico_sdk_import.cmake ./
+
+# Build
+$ mkdir build
+$ cd build/
+/build$ cmake ..
+/build$ make -j8
+/build$ ll picoprobe.uf2 
+-rw-r--r-- 1 ryan ryan 48128 Sep 25 05:07 picoprobe.uf2
+
+# Install picoprobe.uf2 into RPi Pico A
+/build$ cp picoprobe.uf2 /media/user/RPI-RP2/
+```
+
+### Install `minicom`
+```sh
+$ sudo apt install -y minicom
+$ sudo minicom -D /dev/ttyACM0 -b 115200
+```
+
+## 3. Using `picotool`
+```sh
+$ sudo apt install libusb-1.0-0-dev
+$ export PICO_SDK_PATH=~/workspace_arm/pico-sdk
+$ cd ~/workspace_arm/
+$ git clone -b master https://github.com/raspberrypi/picotool.git
+$ cd picotool
+$ cp ~/workspace_arm/pico-sdk/external/pico_sdk_import.cmake ./
+
+# Build
+$ mkdir build
+$ cd build/
+/build$ cmake ..
+/build$ make -j8
+/build$ ll
+-rwxr-xr-x 1 ryan ryan 396176 Sep 25 05:25 picotool*
+/build$ sudo cp ./picotool /usr/bin/
+
+# sample commands
+$ picotool info --pins pico-uart-cpp.elf
+File pico-uart-cpp.elf:
+
+Fixed Pin Information
+ 0:  UART0 TX
+ 1:  UART0 RX
+
+$ picotool info -a pico-uart-cpp.uf2 
+File pico-uart-cpp.uf2:
+
+Program Information
+ name:          pico-uart-cpp
+ version:       0.1
+ features:      UART stdin / stdout
+ binary start:  0x10000000
+ binary end:    0x1000770c
+
+Fixed Pin Information
+ 0:  UART0 TX
+ 1:  UART0 RX
+
+Build Information
+ sdk version:       1.4.0
+ pico_board:        pico
+ boot2_name:        boot2_w25q080
+ build date:        Sep 24 2022
+ build attributes:  Debug
+```

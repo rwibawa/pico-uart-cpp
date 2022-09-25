@@ -25,6 +25,8 @@ add_executable(pico-uart-cpp pico-uart-cpp.cpp )
 
 pico_set_program_name(pico-uart-cpp "pico-uart-cpp")
 pico_set_program_version(pico-uart-cpp "0.1")
+pico_set_program_description(foo "this is a foo")
+pico_set_program_url(foo "https://github.com/rwibawa/pico-uart-cpp")
 
 pico_enable_stdio_uart(pico-uart-cpp 1)
 pico_enable_stdio_usb(pico-uart-cpp 0)
