@@ -1,1 +1,3 @@
 build/
+!build/pico-uart-cpp.dis
+!build/pico-uart-cpp.uf2

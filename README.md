@@ -23,11 +23,11 @@ Build the project:
 $ cd ~/workspace_arm/pico-uart-cpp
 $ mkdir build
 $ cd build/
-$ cmake --version
+/build$ cmake --version
 cmake version 3.14.6
 CMake suite maintained and supported by Kitware (kitware.com/cmake).
-$ cmake ..
-$ make -j8
+/build$ cmake ..
+/build$ make -j8
 /build$ ll
 total 1396
 drwxr-xr-x 7 ryan ryan   4096 Sep 24 19:41 ./
@@ -47,7 +47,12 @@ drwxr-xr-x 6 ryan ryan   4096 Sep 24 19:40 pico-sdk/
 -rw-r--r-- 1 ryan ryan  61440 Sep 24 19:41 pico-uart-cpp.uf2
 drwxr-xr-x 3 ryan ryan   4096 Sep 24 19:41 pioasm/
 
+# Add debug symbols
+/build$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+/build$ make -j8
 ```
+
+[disassembled result](build/pico-uart-cpp.dis)
 
 ## File type
 |File extension |Description|
