@@ -51,7 +51,7 @@ drwxr-xr-x 3 ryan ryan   4096 Sep 24 19:41 pioasm/
 
 ## File type
 |File extension |Description|
-| :===: | :===: |
+| :--- | :--- |
 |.bin |Raw binary dump of the program code and data|
 |.elf |The full program output, possibly including debug information|
 |.uf2 |The program code and data in a UF2 form that you can drag-and-drop on to the RP2040
